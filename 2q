@@ -53,12 +53,8 @@ if __name__== "__main__":
 	# Read in the batches into a list
 	# List to hold each batch
 	batches = []
+	lines = sys.stdin.readlines()	# Holds the raw input text
 
-
-	#lines = sys.stdin.readlines()	# Holds the raw input text
-	file = open("dataset.raw", "r")
-	lines = file.readlines()
-	file.close()
 	numBatch = 0	# number of batches used for index (used for debug printing)
 	
 	# Loop through lines by 2 for S and R pairs
@@ -80,7 +76,6 @@ if __name__== "__main__":
 	# At this point we have all rounds with who spoke in each round
 	# Calculate the messages send and not sent by each user
 	# Not sent
-	test = 0
 	for user in users:
 		# Traverse each batch to determine values for users
 		for batch in batches:
@@ -91,14 +86,10 @@ if __name__== "__main__":
 
 				# Increment t' (number of batches not spoken in)
 				user.tPrime += 1
-				
 
 				# Scan the recievers and set value to probability of message send (1/(Batch Size))
-				for receiver in batch.recievers:
-					if user.vecU[receiver] == 0:
-						user.vecU[receiver] = 1/numBatch	# numBatch(b) = 32
-					else:
-						user.vecU[receiver] += 1/numBatch	# numBatch(b) = 32
+				for receivers in batch.recievers:
+					user.vecU[receivers] = 1/numBatch	# numBatch(b) = 32
 
 			else:	
 				# User has sent a message in this batch
@@ -107,45 +98,35 @@ if __name__== "__main__":
 
 				# TODO not sure if this is correct
 				for receivers in batch.recievers:
-					if user.vecO[receivers] == 0:
-						user.vecO[receivers] = 1/numBatch	# numBatch(b) = 32
-					else:
-						user.vecO[receivers] += 1/numBatch 
-				
-
+					user.vecO[receivers] = 1/numBatch	# numBatch(b) = 32
 
 		# Batches have been scanned
 		# Calculate the big O and U using the Arithmetic mean
 		if user.tPrime != 0:
-			#print(user.name)
 			for key, val in user.vecU.items():
-				#print("%s: %f" % (key, val))
 				user.vecU[key] = val * (1/(user.tPrime))
 
 
 		if user.t != 0:
-			for key, val in user.vecO.items():
-				user.vecO[key] = val * (1/(user.tPrime))
+			for key, val in user.vecV.items():
+				user.vecU[key] = val * (1/(user.tPrime))
 
 		#print(user.name)
 		#print(user.bigU)
 		#print(user.bigO)
 		
 		
-	# Assign the vector V (Final Formula)
-	print("USER:: " + users[0].name)
-	for val in users[0].vecV:
-		print(val + ' ', end='')
+		# Assign the vector V (Final Formula)
+		for val in user.vecV:
+			user.vecV[val] = ((32 * user.vecO[val]) - (32 - 1) * user.vecU[val])
+			#print(val + ' ', end='')
+			#print(user.vecV[val])
 
-		user.vecV[val] = ((32 * user.vecO[val]) - (32 - 1) * user.vecU[val])
-		print(user.vecV[val])
-		#print(val + ' ', end='')
-		#print(user.vecV[val])
-
-
-	print()
-	#sortedUsers = [ (v,k) for k,v in users[0].vecV.items() ]
-	#sortedUsers.sort(reverse=True)
-
-	#for v,k in sortedUsers:
-	#	print ("%s: %f" % (k, v))
+	print("%s %s" % (users[0].name, users[0].vecU))
+	for user in users:
+		#print(user.name)
+		# Sort the dictionary by value
+	
+		sorted = sorted(user.vecV.items(), key=operator.itemgetter(1))
+		#for key in sorted:
+		#	print(key)

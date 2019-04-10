@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
     Nodes = {}
 
-    for j in range(0, 26):
-        for i in range(0, 10):
-            name = chr(i+97) + str(j)
+    for i in range(0, 10):
+        for j in range(0, 26):
+            name = chr(j+97) + str(i)
             Nodes[name] = Node(name)
 
 

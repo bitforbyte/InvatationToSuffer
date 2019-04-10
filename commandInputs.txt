@@ -1,1 +1,1 @@
-java -jar rounds-gen.jar InvatationToSuffur | ./kpart1.py 
+cat groupname.txt | xargs java -jar rounds-gen.jar | ./part1.py 

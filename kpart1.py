@@ -90,7 +90,7 @@ if __name__== "__main__":
     batches = []
 
     #lines = sys.stdin.readlines()  # Holds the raw input text
-    file = open("rounds.csv", "r")
+    file = open("rounds.csv", "r") # TODO Replace file input for stdin
     lines = file.readlines()
     file.close()
     #numBatch = 0   # number of batches used for index (used for debug printing)

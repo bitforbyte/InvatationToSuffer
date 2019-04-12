@@ -13,66 +13,68 @@ class Batch:
 class User:
     def __init__(self, username):
         self.name = username
-        self.numUsers = 260             # N recipients
-        self.numBatch = 32              # b for batch size
+        self.numUsers = 260                         # N recipients
+        self.numBatch = 32                          # b for batch size
 
     def setInfo(self, users, batches):
         self.batches = batches
         self.users = users
 
+    def addProb(self, big, recievers):
+        for received in recievers:
+            # Don't include themselves
+            if self.name != received:
+                # add the prob of them talking to recipients (1/b)
+                if big[received] == 0:
+                    big[received] = 1/self.numBatch
+                else:
+                    big[received] += 1/self.numBatch
+        return big
+        
+
     def findFriends(self):
-        # Find u
-        tPrime = 0
-        bigU = {}               # Final background noise vector
+        tPrime = 0      # Number of rounds user hasn't spoken
+        bigU = {}       # Final background noise vector
+
+        # Create a dictionary with the users
         for i in self.users:
             bigU[i.name] = 0
 
+        # Number of batches user has spoken
+        t = 0
+
+        # Probability of users who recieved message
+        bigO = {}   
+        for i in self.users:
+            bigO[i.name] = 0
+
         # Find the batch where user doesn't speak
         for batch in self.batches:
+
             # If the user isn't a sender
             if self.name not in batch.senders:
                 tPrime += 1
 
                 # For each user who recieved add 1/b to their background distribution to get SUM(ui) from 1 - t'
-                for received in batch.recievers:
-                    if self.name != received:
-                        if bigU[received] == 0:
-                            bigU[received] = 1/self.numBatch
-                        else:
-                            bigU[received] += 1/self.numBatch
-        
-        # Multiply 1/t' to each of the users resulting in Ubar
-        for users in bigU:              
-            bigU[users] *= (1/tPrime)
+                bigU = self.addProb(bigU, batch.recievers)
 
-        t = 0
-        bigO = {}
-        for i in self.users:
-            bigO[i.name] = 0
-
-        # Loop through the batches
-        for batch in self.batches:
-            # See if the name is in the senders
-            if self.name in batch.senders:
+            else: # When the user Did speak
                 t += 1
+                bigO = self.addProb(bigO, batch.recievers)
 
-                for received in batch.recievers:
-                    if self.name != received:
-                        if bigO[received] == 0:
-                            bigO[received] = 1/self.numBatch
-                        else:
-                            bigO[received] += 1/self.numBatch
+        # Loop through the users and multiply to get the sums
+        for users in self.users:
+             bigU[users.name] *= (1/tPrime)
+             bigO[users.name] *= (1/t)
 
-        for users in bigO:
-            bigO[users] *= (1/t)
-        
-
+        # Final Formula to determine most likely 
         vecV = {}
         for i in self.users:
             vecV[i.name] = (1/1) * ((self.numBatch * bigO[i.name]) - (self.numBatch - 1) * bigU[i.name])
-
-        return vecV
+        
         # Return list of most likely friends
+        return vecV
+
 
 if __name__== "__main__":
 
@@ -88,7 +90,7 @@ if __name__== "__main__":
     batches = []
 
     #lines = sys.stdin.readlines()  # Holds the raw input text
-    file = open("dataset.raw", "r")
+    file = open("rounds.csv", "r")
     lines = file.readlines()
     file.close()
     #numBatch = 0   # number of batches used for index (used for debug printing)
@@ -106,19 +108,19 @@ if __name__== "__main__":
 
     for i in range(0, 260):
         if i % 10 == 0:
-            print(i)
+            #print(i)
             users[i].setInfo(users, batches)
             final = users[i].findFriends()
-            print(users[i].name)
+            print(users[i].name, end='')
 
+            # Sort in Decending order
             sorted_final = sorted(final.items(), key=lambda kv: kv[1], reverse=True)
             count = 0
-            for i in sorted_final:
-                print(i)
+
+            # Print the first 3 friends
+            for key in sorted_final:
+                print(',' + key[0], end='')
                 count += 1
-                if count == 5:
+                if count == 3:
+                        print()
                         break
-    #for user in users:
-    #   user.setInfo(users, batches)
-    #   user.findFriends()
-        #print(user.findFriends())

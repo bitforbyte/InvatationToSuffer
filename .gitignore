@@ -1,1 +1,5 @@
 .vscode/
+rounds.csv
+truth.csv
+test.txt
+results.txt

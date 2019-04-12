@@ -1,6 +1,7 @@
 #!/usr/bin/python3
-
+import time
 import socket
+import re
 
 TCP_IP = '160.36.57.98'
 BUFFER_SIZE = 1024
@@ -21,10 +22,30 @@ if __name__== "__main__":
     nodes.append(Node('80da3d512c17287e6ec3667d0248ced0e9cf1124a46d49fd5447efd20d7ee440', tcp_port))
     
     #while(1):
-    soc.send("PEER\n")
     
-    while(1):
+    #soc.settimeout(10)
+    
+    ids = []
+    count = 0
+    while(count < 30):
+        soc.send("PEERS\n".encode('utf-8'))
         data = soc.recv(BUFFER_SIZE)
+        parsedata = data.decode('utf-8')
+        dataBreak = parsedata.split('\n')
+        #print(dataBreak)
 
-    print('received:' + repr(data))
+        for each in dataBreak:
+            print(' ' + each,end='')
+            if each:
+                print(' - String')
+            else:
+                print(' - Not String')
+            #if each and not each.isspace():
+            #nodeId = re.search('8(.*)@', each)
+            #ipAddr = re.search('@(.*):', each)
+            #nodePort = re.search(':(.*)\n', each)
+            #print('%s %s %s\n' % (nodeId.group(1), ipAddr.group(1), nodePort.group(1)))
+        count += 1
+
     soc.close() 
+

@@ -37,7 +37,10 @@ if __name__== "__main__":
         for each in dataBreak:
             print(' ' + each,end='')
             if each:
-                print(' - String')
+                nodeId = re.search('8(.*)@', each)
+                ipAddr = re.search('@(.*):', each)
+                nodePort = re.search(':(.*)\n', each)
+                print('%s %s %s\n' % (nodeId.group(1), ipAddr.group(1), nodePort.group(1)))
             else:
                 print(' - Not String')
             #if each and not each.isspace():

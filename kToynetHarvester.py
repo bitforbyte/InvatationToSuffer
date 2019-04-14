@@ -10,8 +10,15 @@ class Node:
     def __init__(self, nodeId, port):
         self.id = nodeId
         self.port = port
+    
+class bot:
+    def __init__(self, port):
+        self.host = TCP_IP
+        self.port = port
+        self.soc = None
+    
 
-def findPeers(nodeID, tcp_port, soc):
+def findPeers(nodeID, soc):
     nodes = []
     counter = 0
 
@@ -26,7 +33,7 @@ def findPeers(nodeID, tcp_port, soc):
         # Check to see if Punished
         if parsedata.find('BANNED') != -1:
             num = re.search("\d+\.\d+", parsedata)
-            print("BANNED: Flail thy self for %s minutes" % num.group(0))
+            print("BANNED: Flail thyself for %s minutes" % num.group(0))
             raise ConnectionResetError()
 
         dataBreak = parsedata.split('\n')
@@ -79,32 +86,58 @@ if __name__== "__main__":
     
 
     users = []
+    privateUsers = []
 
     # Entry point
     users.append(Node('80da3d512c17287e6ec3667d0248ced0e9cf1124a46d49fd5447efd20d7ee440', tcp_port))
 
     # Keep track of users we've been to
-    contacted = [users[0]]
+    contacted = []
+
+    fil = open("peers.txt", 'w')
 
     # For loop
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    soc.connect((TCP_IP, tcp_port))
-    connections.append(soc)
-    try:
-        peers = findPeers(users[0].id,users[0].port, connections[0])
-        print('peers: ')
+    for user in users:
+        print(user.id)
+        if user.id not in contacted:
+            print(user.id)
+            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        for i in peers:
-            print(i.id, ' ',end='')
-            print(i.port)
-        users.extend(peers)
-    except KeyboardInterrupt:
-        print("Closing")
-    except ConnectionResetError as error:
-        print("Connection reset by peer")
-        #print(re.search('b\'*\n', error))
-    except NameError:
-        print("Name Error")
+            try:
+                soc.connect((TCP_IP, int(user.port)))
+            except ConnectionRefusedError:
+                print("Host: (Private)", user.id)
+                if user.id not in privateUsers:
+                    fil.write("Host: (Private) " + user.id + " " + str(tcp_port)  +"\n")
+                    privateUsers.append(user.id)
+                continue
+            connections.append(soc)
 
+            try:
+                peers = findPeers(user.id, soc)
+                fil.write("Host: " + user.id + "\n")
+                print("Host: ", user.id)
+                print('peers: ')
+
+                for i in peers:
+                    
+                    print(i.id, ' ',end='')
+                    print(i.port)
+                
+                for peer in peers:
+                    if peer not in users:
+                        fil.write("    " + str(peer.id) + " " + str(peer.port) + "\n")
+                        users.append(peer)
+                contacted.append(user.id)
+                print("\n\n")
+            except KeyboardInterrupt:
+                print("\nClosing")
+            except ConnectionResetError as error:
+                print("Connection reset by peer")
+                #print(re.search('b\'*\n', error))
+            except NameError:
+                print("Name Error")
+            #soc.close()
     # For Loop closing
-    connections[0].close()
+    for con in connections:
+        con.close()

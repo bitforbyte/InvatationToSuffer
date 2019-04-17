@@ -124,5 +124,10 @@ if __name__ == "__main__":
                 Net.nodes[k].public = launch(v.ip, v.port)
                 Net.nodes[k].done = True
 
-    for v in Net.nodes.copy().values():
-        print("{}@{}:{}".format(v.node_id, v.ip, v.port))
+    if len(sys.argv) > 1 and sys.argv[1] == 'y':
+        for v in Net.nodes.copy().values():
+            if v.public == True:
+                print("{},{},{}".format(v.node_id, v.ip, v.port))
+    else:
+        for v in Net.nodes.copy().values():
+            print("{}@{}:{}".format(v.node_id, v.ip, v.port))

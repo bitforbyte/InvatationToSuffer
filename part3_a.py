@@ -14,6 +14,7 @@ def net_buster(filename, seek_loc):
 
         date_time = -1
         while round_done == False:
+            cur_seek = f.tell()
             line = f.readline()
 
             if line == "":
@@ -68,7 +69,7 @@ def net_buster(filename, seek_loc):
 
             elif round_offer_done == True and round_ack_done == True:
                 if "OFFER" in line:
-                    next_round_seek = f.tell()
+                    next_round_seek = cur_seek
                     round_done = True
 
             else:
@@ -81,7 +82,6 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(1)
     
-
     (next_seek, s, r) = net_buster(sys.argv[1], 0)
 
     print("NEXT SEEK = {}".format(next_seek))

@@ -64,8 +64,11 @@ class User:
 
         # Loop through the users and multiply to get the sums
         for users in self.users:
-             bigU[users.name] *= (1/tPrime)
-             bigO[users.name] *= (1/t)
+            if tPrime != 0:
+                bigU[users.name] *= (1/tPrime)
+            
+            if t != 0:
+                bigO[users.name] *= (1/t)
 
         # Final Formula to determine most likely 
         vecV = {}
@@ -83,10 +86,21 @@ if __name__== "__main__":
     batches = []
 
     #TODO add users to file from part 2 (pub and priv)
+    users = []
+    file = open("peers.txt", "r")
+    lin = file.readlines()
+    file.close()
+
+    for i in lin:
+        #print(i[:64])
+        users.append(User(i[:64]))
+
+    lines = sys.stdin.readlines()
 
     #Sam's return function call (loop? that covers everything below)
     # return function gives New start spot, senders array, receivers array
     # StartLoc, sendersList, recieversList = funcReturn()
+    
 
     # Loop through lines by 2 for S and R pairs
     for i in range(0, len(lines)-1,2):
@@ -100,22 +114,21 @@ if __name__== "__main__":
         batches.append(Batch(sendersList, recieversList))
 
 
-    for i in range(0, 260):
-        if i % 10 == 0:
-            #print(i)
-            #users might need to be changed to IDlist
-            users[i].setInfo(users, batches)
-            final = users[i].findFriends()
-            print(users[i].name, end='')
+    for i in range(0,len(users)):
+        #print(i)
+        #users might need to be changed to IDlist
+        users[i].setInfo(users, batches)
+        final = users[i].findFriends()
+        print(users[i].name, end='')
 
-            # Sort in Decending order
-            sorted_final = sorted(final.items(), key=lambda kv: kv[1], reverse=True)
-            count = 0
+        # Sort in Decending order
+        sorted_final = sorted(final.items(), key=lambda kv: kv[1], reverse=True)
+        count = 0
 
-            # Print the first 3 friends
-            for key in sorted_final:
-                print(',' + key[0], end='')
-                count += 1
-                if count == 3:
-                        print()
-                        break
+        # Print the first 3 friends
+        for key in sorted_final:
+            print(',' + key[0], end='')
+            count += 1
+            if count == 3:
+                    print()
+                    break

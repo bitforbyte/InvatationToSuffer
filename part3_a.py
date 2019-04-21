@@ -78,22 +78,39 @@ def net_buster(filename, seek_loc):
     return (next_round_seek, senders, recievers)
 
 
+def _printUsers(users):
+    for i, val, in enumerate(users):
+        if i < (len(users) - 1):
+            print("'%s', " % val, end='')
+        else:
+            print("'%s']" % val)
+
+def printRound(senders, recevers):
+    print("S:[", end='')
+    _printUsers(senders)
+    print("R:[", end='')
+    _printUsers(recevers)
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(1)
     
-    (next_seek, s, r) = net_buster(sys.argv[1], 0)
+    next_seek = 0
+    while (next_seek != -1):
+        (next_seek, s, r) = net_buster(sys.argv[1], next_seek)
+        printRound(s,r)
 
-    print("NEXT SEEK = {}".format(next_seek))
-    for node in s:
-        print("S: {}".format(node))
-    for node in r:
-        print("R: {}".format(node))
+    #print("NEXT SEEK = {}".format(next_seek))
+    
+    #for node in s:
+    #    print("S: {}".format(node))
+    #for node in r:
+    #    print("R: {}".format(node))
 
-    (next_seek, s, r) = net_buster(sys.argv[1], next_seek)
-
-    print("NEXT SEEK = {}".format(next_seek))
-    for node in s:
-        print("S: {}".format(node))
-    for node in r:
-        print("R: {}".format(node))
+    #(next_seek, s, r) = net_buster(sys.argv[1], next_seek)
+    #print("NEXT SEEK = {}".format(next_seek))
+    #printRound(s,r)
+    #for node in s:
+    #    print("S: {}".format(node))
+    #for node in r:
+    #    print("R: {}".format(node))

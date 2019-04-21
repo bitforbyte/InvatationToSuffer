@@ -1,1 +1,2 @@
 cat groupname.txt | xargs java -jar rounds-gen.jar | ./part1.py 
+python3 part3_a.py rounds_dump.txt | python3 kpart1_part3.py

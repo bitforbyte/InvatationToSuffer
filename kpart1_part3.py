@@ -114,7 +114,7 @@ if __name__== "__main__":
         batches.append(Batch(sendersList, recieversList))
 
 
-    for i in range(0,len(users)):
+    for i in range(0, len(users)):
         #print(i)
         #users might need to be changed to IDlist
         users[i].setInfo(users, batches)

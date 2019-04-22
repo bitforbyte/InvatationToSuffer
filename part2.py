@@ -8,6 +8,7 @@ import re
 # Node in network
 class Node:
     def __init__(self, ident):
+        self.ident = ident
         self.node_id = ident.split('@')[0]
         self.ip = ident.split('@')[1].split(':')[0]
         self.port = int(ident.split('@')[1].split(':')[1])
@@ -26,11 +27,34 @@ class Network:
             self.nodes[ident] = Node(ident)
             return False
 
+class MapNode:
+    def __init__(self):
+        self.connection = []
+
+    def addConnection(self, ident):
+        if ident not in self.connection:
+            self.connection.append(ident)
+
+class NetworkMap:
+    def __init__(self):
+        self.nodes = {}
+
+    def addConnection(self, ident1, ident2):
+        if ident1 not in self.nodes:
+            self.nodes[ident1] = MapNode()
+
+        if ident2 not in self.nodes:
+            self.nodes[ident2] = MapNode()
+
+        self.nodes[ident1].addConnection(ident2)
+        self.nodes[ident2].addConnection(ident1)
+
 # REGEX string to parse PEERS responces
 reg = r"^[a-zA-Z0-9]{64}@[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:[0-9]*"
 Net = Network()
+NetMap = NetworkMap()
 
-def launch(IP, PORT):
+def launch(IP, PORT, ident):
     sys.stderr.write("Attempting to connect to {} {}\n".format(IP, PORT))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,6 +111,9 @@ def launch(IP, PORT):
 
                 # Add node, if it has not been added reset cound.
                 # Otherwise increment 
+
+                NetMap.addConnection(ident, line);
+
                 if Net.addNode(line) == False:
                     count = 0
                 else:
@@ -117,17 +144,26 @@ if __name__ == "__main__":
         # Cannot modify dict while iterating through so make a copy
         for k,v in Net.nodes.copy().items():
 
-            sys.stderr.write("Looking at node {}@{}:{}\n".format(v.node_id, v.ip, v.port))
+            sys.stderr.write("Looking at node {}\n".format(v.ident))
 
             if v.done == False:
                 done = False
-                Net.nodes[k].public = launch(v.ip, v.port)
+                Net.nodes[k].public = launch(v.ip, v.port, v.ident)
                 Net.nodes[k].done = True
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'y':
+    if len(sys.argv) > 1 and sys.argv[1] == 'pub':
         for v in Net.nodes.copy().values():
             if v.public == True:
                 print("{},{},{}".format(v.node_id, v.ip, v.port))
+    elif len(sys.argv) > 1 and sys.argv[1] == 'priv':
+        for v in Net.nodes.copy().values():
+            if v.public == False:
+                print("{},{},{}".format(v.node_id, v.ip, v.port))
+    elif len(sys.argv) > 1 and sys.argv[1] == 'map':
+        for k,v in NetMap.nodes.items():
+            print("{}:".format(k))
+            for i in v.connection:
+                print("\t>{}".format(i))
     else:
         for v in Net.nodes.copy().values():
             print("{}@{}:{}".format(v.node_id, v.ip, v.port))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys, re, datetime
 
 def net_buster(filename, seek_loc):
@@ -96,21 +97,7 @@ if __name__ == "__main__":
         sys.exit(1)
     
     next_seek = 0
+
     while (next_seek != -1):
         (next_seek, s, r) = net_buster(sys.argv[1], next_seek)
         printRound(s,r)
-
-    #print("NEXT SEEK = {}".format(next_seek))
-    
-    #for node in s:
-    #    print("S: {}".format(node))
-    #for node in r:
-    #    print("R: {}".format(node))
-
-    #(next_seek, s, r) = net_buster(sys.argv[1], next_seek)
-    #print("NEXT SEEK = {}".format(next_seek))
-    #printRound(s,r)
-    #for node in s:
-    #    print("S: {}".format(node))
-    #for node in r:
-    #    print("R: {}".format(node))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Example id VVVV
 # 80da3d512c17287e6ec3667d0248ced0e9cf1124a46d49fd5447efd20d7ee440@160.36.57.98:10732
 
@@ -161,9 +162,9 @@ if __name__ == "__main__":
                 print("{},{},{}".format(v.node_id, v.ip, v.port))
     elif len(sys.argv) > 1 and sys.argv[1] == 'map':
         for k,v in NetMap.nodes.items():
-            print("{}:".format(k))
+            print("{},{}:".format(k, Net.nodes[k].public))
             for i in v.connection:
-                print("\t>{}".format(i))
+                print("\t>{},{}".format(i, Net.nodes[i].public))
     else:
         for v in Net.nodes.copy().values():
             print("{}@{}:{}".format(v.node_id, v.ip, v.port))

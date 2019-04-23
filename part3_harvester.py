@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys, signal, socket, time, datetime, threading
 
 global_lock = threading.Lock()

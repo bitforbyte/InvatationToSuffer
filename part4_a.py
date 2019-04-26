@@ -34,11 +34,12 @@ if __name__ == "__main__":
                 if curNode != None:
                     curNode.connected.append(line.split('@')[0].replace('>',''))
 
+        if curNode != None:
+            privateNodes.append(curNode)
+
         for priv in privateNodes:
-            print("{} : {}".format(priv.id, len(priv.connected)))
-            '''
+            #print("{} : {}".format(priv.id, len(priv.connected)))
             print("{}".format(priv.id), end='')
             for i in priv.connected:
                 print(", {}".format(i), end='')
             print("")
-        '''

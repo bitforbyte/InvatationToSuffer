@@ -39,3 +39,6 @@ There are multiple programs for part 3
 3. `part3_c.py` Reads from stdin for sender/reciever output, takes on argument which are the nodes that it should build friend relationships with
 
 ## Part 4
+Programs for part 4
+1. `part4_a.py` Builds private sender/reciever pairs from the file `rounds_dump.txt` and prints to stdout
+2. `part4_c.py` The exact same as `part3_c.py` just copied for verboseness

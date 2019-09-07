@@ -22,7 +22,7 @@ class NetBuster:
                     big[received] += 1/self.numBatch
         return big
         
-
+    # Will deanonymize using a statistical analysis attack
     def deanonymize(self, currUser):
         tPrime = 0      # Number of rounds user hasn't spoken
         bigU = {}       # Final background noise vector

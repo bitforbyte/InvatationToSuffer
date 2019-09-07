@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 import os, binascii, random, sys
-from datetime import datetime
+
+# Generate users for the mix network
+def genUsers(nameLen, numUsers):
+    users = []
+    for i in range(numUsers):
+        # Generate unique users
+        while True:
+            user = ''.join([str(y) for x in range(nameLen) for y in random.choice('0123456789abcdef')])
+            if user not in users:
+                break
+        users.append(user)
+    return users
+
 class MixGen:
     def __init__(self, nameLen, numUsers, numFriends, batchSize, rounds,seed=random.seed()):
         self.nameLen = nameLen
@@ -8,33 +20,21 @@ class MixGen:
         self.numFriends = numFriends
         self.batchSize = batchSize
         self.numRounds = rounds
+        self.users = genUsers(self.nameLen,self.numUsers)
         random.seed(seed)
-
-    # Generate users for the mix network
-    def genUsers(self):
-
-        users = []
-        for i in range(self.numUsers):
-            # Generate unique users
-            while True:
-                user = ''.join([str(y) for x in range(self.nameLen) for y in random.choice('0123456789abcdef')])
-                if user not in users:
-                    break
-            users.append(user)
-        return users
-
+        
     # Generate the friends for the user to talk to, default is 2 friends per user
-    def genFriends(self, users):
+    def genFriends(self):
         friendDict = {}
 
-        for user in users:
+        for user in self.users:
             # Generate friends for user
             # NOTE May need to use Power distribution to select friends
-            friends = random.choices(users, k=self.numFriends)
+            friends = random.choices(self.users, k=self.numFriends)
 
             # User shouln't be there own friend, no duplicates
             while(user in friends or len(friends) != len(set(friends))):
-                friends = random.choices(users, k=self.numFriends)
+                friends = random.choices(self.users, k=self.numFriends)
             friendDict[user] = friends
 
         return friendDict
@@ -83,8 +83,7 @@ class MixGen:
     # Create the rounds (users, friends, and rounds)
     def createRounds(self, write=False):
         # TODO add length error check
-        users = self.genUsers()
-        friendDict = self.genFriends(users)
+        friendDict = self.genFriends()
         rounds = []
 
         for i in range(self.numRounds):
@@ -93,6 +92,6 @@ class MixGen:
             rounds.append(recievers)
 
         if (write):
-            self.writetoFile(users, friendDict, rounds)
+            self.writetoFile(self.users, friendDict, rounds)
         
-        return users, friendDict, rounds
+        return self.users, friendDict, rounds

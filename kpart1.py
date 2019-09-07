@@ -3,17 +3,19 @@ import operator
 import string
 import sys
 import ast
-import NetBuster
+import MixNetBuster as mnb
 
 def main():
-    #users = []
+    # Get the users
     fileName = open("_UsersGen.txt", "r") # TODO Replace file input for stdin
     userNames = fileName.readlines()
     fileName.close()
+
     users = []
     for user in userNames:
-        users.append(NetBuster.User(user.rstrip()))    # Users list that will hold each of the users in a class  
-    # Read in the batches into a list
+        users.append(mnb.User(user.rstrip()))    # Users list that will hold each of the users in a class  
+
+    # Read in the rounds into a list
     # List to hold each batch
     rounds = []
 
@@ -29,12 +31,11 @@ def main():
         recieversList = ast.literal_eval(lines[i+1][2:])
 
         # assign the Senders and Recievers into the batch list
-        rounds.append(NetBuster.Round(sendersList, recieversList))
+        rounds.append(mnb.Round(sendersList, recieversList))
 
-
+    nb = mnb.NetBuster(users, rounds, 32)
     for i in range(0, 260):
-        users[i].setInfo(users, rounds)
-        final = users[i].findFriends()
+        final = nb.deanonymize(users[i].name)
         print(users[i].name, end='')
 
         # Sort in Decending order
